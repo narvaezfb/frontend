@@ -1,6 +1,12 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Button, TextField, Typography, Container } from "@mui/material";
+import {
+	Button,
+	TextField,
+	Typography,
+	Container,
+	unstable_ClassNameGenerator,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -27,8 +33,11 @@ const Login = () => {
 			});
 
 			if (response.status) {
+				console.log(response);
 				const token = response.data.token;
+				const userId = response.data.user.userID;
 				localStorage.setItem("authToken", token);
+				localStorage.setItem("userId", userId);
 				navigate("/");
 			} else {
 				console.log("Auth Failed");
