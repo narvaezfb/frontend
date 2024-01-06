@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Container, TextField, Button, Box, Typography } from "@mui/material";
-import * as signalR from "@microsoft/signalr";
+import signalRService from "./../Services/SignalRService";
 
 const ChatApp = () => {
 	const [messages, setMessages] = useState([]);
@@ -8,66 +8,22 @@ const ChatApp = () => {
 	const [content, setContent] = useState("");
 	const senderId = localStorage.getItem("userId");
 
-	const connection = new signalR.HubConnectionBuilder()
-		.withUrl(`https://localhost:7126/chat-hub/?userId=${senderId}`)
-		.build();
-
-	useEffect(() => {
-		startConnection();
-		connection.on("ReceiveMessage", handleReceivedMessage);
-		connection.on("ReceiveError", handleReceivedError);
-
-		return () => {
-			stopConnection();
-		};
-	}, []);
-
-	const startConnection = async () => {
-		try {
-			if (
-				connection.state !== signalR.HubConnectionState.Connected ||
-				connection.state !== signalR.HubConnectionState.Connecting
-			) {
-				await connection.start();
-				console.log(connection.state);
-				return console.log("Connected to SignalR hub", connection.connectionId);
-			}
-			console.log(
-				"Connection already in place to SignalR hub",
-				connection.connectionId
-			);
-			return;
-		} catch (error) {
-			console.error("Error connecting to SignalR hub:", error);
-		}
-	};
-
-	const stopConnection = async () => {
-		if (
-			connection &&
-			connection.state === signalR.HubConnectionState.Connected
-		) {
-			connection.off("ReceiveMessage", handleReceivedMessage);
-			connection.off("ReceiveError", handleReceivedError);
-			connection.stop();
-		}
-	};
+	useEffect(() => {}, []);
 
 	const sendMessageToHub = async () => {
-		await startConnection();
-
-		if (connection.state === signalR.HubConnectionState.Connected) {
-			connection
-				.invoke("SendMessageToUser", senderId, receiverId, content)
-				.then(() => {
-					console.log("message has been sent!");
-				})
-				.catch((error) => {
-					console.error("Error sending message to hub:", error);
-				});
-		} else {
-			console.warn("SignalR connection is not established.");
-		}
+		// await startConnection();
+		// if (connection.state === signalR.HubConnectionState.Connected) {
+		// 	connection
+		// 		.invoke("SendMessageToUser", senderId, receiverId, content)
+		// 		.then(() => {
+		// 			console.log("message has been sent!");
+		// 		})
+		// 		.catch((error) => {
+		// 			console.error("Error sending message to hub:", error);
+		// 		});
+		// } else {
+		// 	console.warn("SignalR connection is not established.");
+		// }
 	};
 
 	const handleReceivedMessage = (content) => {
