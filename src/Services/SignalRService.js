@@ -1,19 +1,21 @@
 import * as signalR from "@microsoft/signalr";
 
-const signalRService = {
-	connection: null,
+class SignalRService {
+	constructor() {
+		this.connection = null;
+	}
 
-	createConnection: (senderId) => {
-		if (!signalRService.connection) {
-			signalRService.connection = new signalR.HubConnectionBuilder()
+	async createConnection(senderId) {
+		if (!this.connection) {
+			this.connection = new signalR.HubConnectionBuilder()
 				.withUrl(`https://localhost:7126/chat-hub/?userId=${senderId}`)
 				.build();
 		}
-		return signalRService.connection;
-	},
+		return this.connection;
+	}
 
-	handleOnClose: (reconnectCallback) => {
-		signalRService.connection.onclose((error) => {
+	handleOnClose(reconnectCallback) {
+		this.connection.onclose((error) => {
 			console.log("Connection closed:", error);
 
 			// Implement reconnection logic or show alerts/messages to the user
@@ -21,29 +23,29 @@ const signalRService = {
 				reconnectCallback(); // Call the provided reconnect callback function
 			}
 		});
-	},
-	startConnection: async (senderId) => {
+	}
+
+	async startConnection() {
 		try {
-			signalRService.createConnection(senderId); // Create the connection if not already created
-			await signalRService.connection.start();
+			await this.connection.start();
 			console.log("SignalR connection started.");
 		} catch (error) {
 			console.error("Error starting SignalR connection:", error);
 			throw error;
 		}
-	},
+	}
 
-	stopConnection: () => {
-		if (signalRService.connection) {
-			signalRService.connection.stop();
+	stopConnection() {
+		if (this.connection) {
+			this.connection.stop();
 			console.log("SignalR connection stopped.");
-			signalRService.connection = null; // Reset the connection object
+			this.connection = null;
 		}
-	},
+	}
 
-	getConnection: () => {
-		return signalRService.connection;
-	},
-};
+	getConnection() {
+		return this.connection;
+	}
+}
 
-export default signalRService;
+export default SignalRService;
